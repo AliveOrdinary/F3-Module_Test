@@ -15,12 +15,12 @@ window.addEventListener('DOMContentLoaded', async function () {
     })
 })
 
-submitBtn.addEventListener('click',async ()=>{
+submitBtn.addEventListener('click', async () => {
     const address = addressEl.value;
-    if(address){
+    if (address) {
         fetchAddressData(address)
-    }else{
-        let errorMsg = `<p class="error">Please enter an address!</p>`
+    } else {
+        let errorMsg = `<p class="error">Please enter a valid address!</p>`
         inputData.innerHTML = errorMsg;
     }
 })
@@ -36,17 +36,7 @@ async function fetchTimeData(lat, long) {
     locationData = locationResp.results[0];
     displayLocationData(locationData)
 
-    // try {
 
-
-    //     if (locationResp.length) {
-    //     }else{
-    //         throw new Error();
-    //     }
-    // }
-    // catch (error) {
-    //     console.log("Invalid Timezone")
-    // }
 }
 
 
@@ -72,12 +62,23 @@ async function fetchAddressData(address) {
 
     // const address = 'Carrer del Pintor Navarro Llorens, 7, 46008 València, Valencia, Spain';
 
-    const response = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=55f07b2d1a704cbcb5b9c574b767ad10`);
+    try {
+        const response = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=55f07b2d1a704cbcb5b9c574b767ad10`);
 
-    const addressResp = await response.json();
-    addressData = addressResp.features[0].properties;
-    // console.log(addressData);
-    displayAddressData(addressData)
+        const addressResp = await response.json();
+        addressData = addressResp.features[0].properties;
+        
+
+        if (addressData) {
+            displayAddressData(addressData)
+        } else {
+            throw new Error();
+        }
+    }
+    catch (error) {
+        let errorMsg = `<p class="error">Please enter a valid address!</p>`
+        inputData.innerHTML = errorMsg;
+    }
 
     // await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=55f07b2d1a704cbcb5b9c574b767ad10`)
     //     .then(resp => resp.json())
@@ -87,7 +88,7 @@ async function fetchAddressData(address) {
 }
 
 
-function displayAddressData(item){
+function displayAddressData(item) {
     let displayAddressData = `<h1 class="title">Your Result</h1><div class="inner-data">
     <p>Name Of Time Zone : ${item.timezone.name}</p>
     <p>Lat : ${item.lat}</p> <p>Long : ${item.lon}</p>
